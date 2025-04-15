@@ -63,24 +63,29 @@ const searchInput = document.getElementById("search-input");
 // you should use more than just an array of strings to store it all.
 
 // This function adds cards the page to display the data in the array
-function showCards(muscle=null) {
+function showCards(trigger) {
   const cardContainer = document.getElementById("card-container");
-  searchQuery = document.getElementById("search-input").value;
+  const searchQuery = document.getElementById("search-input").value;
   filters = document.getElementById("filter-sort-panel"); 
   cardContainer.innerHTML = "";
   const templateCard = document.querySelector(".card");
   // turn the map of filters into a single array of filter options
-  const filterListConcat = [];
-  console.log(muscle);
+  let filterListConcat = [];
+  let searchQueryFiltered = []
+  let keywordList = [];
+
+  //Store muscle variable if showCards was triggered by a muscle click. Allows to filters to be applied when searching by muscle
+  if (muscle) {
+    const muscleSelected = muscle;
+  }
   Object.keys(filterList).forEach(key => {
     if (filterList[key]) {filterListConcat.push(filterList[key].toLowerCase())}
   });
   for (let i = 0; i < exercises.length; i++) {
     let exercise = exercises[i];
     //Converts the text input of search box into a list of lowercase words, delimited by space. Does the same for exercise.name and .muscles while combining them into 1 array
-    const searchQueryFiltered = searchQuery.toLowerCase().split(" ");
-    const keywordList = exercise.name.toLowerCase().split(" ").concat(exercise.muscles.map(x => x.toLowerCase()));
-    console.log(filterListConcat);
+    searchQueryFiltered = searchQuery.toLowerCase().split(" ");
+    keywordList = exercise.name.toLowerCase().split(" ").concat(exercise.muscles.map(x => x.toLowerCase()));
     const includesFilter = filterListConcat.length > 0 ? filterListConcat.some(x => exercise.tags.includes(x)) : true
 
     //If the exercise name or exercises contain one of the words typed in the search bar and if its tags match one of the filters
@@ -100,6 +105,7 @@ function hideCards (switching) {
   filters = document.getElementById("filter-sort-panel"); 
   cardContainer = document.getElementById("card-container");
   searchBar = document.getElementById("search-container");
+  cardContainer.innerHTML = "";
   if (!switching) {
     filters.style.display = "none ";
   }
@@ -111,7 +117,7 @@ function hideCards (switching) {
 }
 
 function clearFilterSort() {
-  for (let x = 0; x <  filterComp.length-1; x++) {
+  for (let x = 0; x <  filterComp.length; x++) {
     filterList[filterComp[x].textContent] = null;
   }
   showCards();
@@ -119,7 +125,7 @@ function clearFilterSort() {
 
 function searchVisible() {
   hideMuscles();
-  hideCards(true);
+  // hideCards(true);
   searchBar = document.getElementById("search-container");
   
   if (keywordClicked == false){
@@ -177,13 +183,13 @@ document.addEventListener("DOMContentLoaded", function(){
 
   //Iterates over all filter categories and adds them to the filterList map. 
   filterComp = document.getElementById("filter-sort-panel").getElementsByClassName("dropdown-button");
-  for (let x = 0; x <  filterComp.length-1; x++) {
+  for (let x = 0; x <  filterComp.length; x++) {
     filterList[filterComp[x].textContent] = null;
     
   }
   //Iterates over all items in all filter categories and adds them to the tags map
   tagsComp = document.getElementById("filter-sort-panel").getElementsByTagName("details");
-  for (let x = 0; x < tagsComp.length-1; x++) {
+  for (let x = 0; x < tagsComp.length; x++) {
     liComp = tagsComp[x].getElementsByTagName("li");
     for (let y = 0; y < liComp.length; y++) {
       
@@ -193,12 +199,11 @@ document.addEventListener("DOMContentLoaded", function(){
         //if the filter category does not equal filter selection
         if (filterList[filterCat] != e.target.textContent){
           filterList[filterCat] = e.target.textContent
-          showCards();
+          showCards(e.parentElement.);
         }
       });
     }
     
-    // tagsComp[x].addEventListener('click', showCards)
     
   }
 
@@ -235,7 +240,10 @@ function showMuscles () {
   backDiagram.src = bodyImages.back;
   musclePanel.style.display = "flex";
   musclePanel.style.visibility = "visible";
-  musclePanel.style.opacity = "1";  
+  musclePanel.style.opacity = "1";
+  const searchQuery = document.getElementById("search-input");
+  searchQuery.value = "";
+  console.log(searchQuery.value);
 
   for (let i = 0; i < muscleSelectors.length; i++){
     if (muscleSelectors[i].parentElement.id == "front-body-panel"){
